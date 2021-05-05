@@ -1,0 +1,38 @@
+{
+    "compilerOptions": {
+      "incremental": true,
+      "target": "es2019",
+      "module": "commonjs",
+      "lib": ["esnext", "es2020"],
+      "jsx": "preserve",
+      "sourceMap": true,
+      "isolatedModules": true,
+  
+      "strict": true,
+      "noImplicitAny": true,
+      "strictNullChecks": true,
+      "strictFunctionTypes": true,
+      "skipLibCheck": true,
+  
+      "moduleResolution": "node",
+      "baseUrl": ".",
+      "paths": {
+        "*": ["node_modules/*", "src/types/*"],
+        "test/*": ["test/*"],
+        "~/*": ["src/*"]
+      },
+      "outDir": "./dist",
+      "typeRoots": ["node_modules/@types", "./src/_typings/**/*"],
+      "allowSyntheticDefaultImports": true,
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+  
+      "forceConsistentCasingInFileNames": true
+    },
+    "includes": ["src"],
+    "exclude": ["test", "dist"],
+    "awesomeTypescriptLoaderOptions": {
+      "useCache": true,
+      "reportFiles": ["src/**/*.{ts,tsx}"]
+    }
+  }

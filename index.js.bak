@@ -1,0 +1,51 @@
+const DateFNS = require("date-fns");
+const knex = require('knex')({
+    client: 'mysql',
+    version: '5.7',
+    connection: {
+      host : '127.0.0.1',
+      user : 'root',
+      password : 'password',
+      database : 'testdb',
+      port: 6606
+    }
+  });
+
+/* raw SQL before knex translation
+
+SELECT doc_number, store_id, created_at
+FROM reminders 
+    WHERE created_at > NOW() - (3 * 3600) 
+    AND (store_id, created_at) IN (
+        SELECT store_id, MAX(created_at) AS created_at
+        FROM reminders
+        GROUP BY store_id
+    );
+
+*/ 
+
+const expiryDate = DateFNS.subHours(new Date(Date.now()), 3)
+
+const subQuery = knex("reminders")
+ .select('store_id', knex.raw('max(created_at) as created_at'))
+ .groupBy("store_id")
+
+knex("reminders")
+.select("doc_number", "store_id", "created_at")
+.where('created_at', '<=', expiryDate)
+//.andWhere(knex.raw("(store_id, created_at)"), 'in', subQuery)
+.whereIn(["store_id", "created_at"], subQuery)
+//.then(rows => console.log(rows.filter(shouldBeNotified))) 
+.then(rows => console.log(rows)) 
+
+function shouldBeNotified(row) {
+   const createdAt = row.created_at
+   const createdAtInSeconds = DateFNS.getUnixTime(createdAt) 
+   const nowInSeconds = DateFNS.getUnixTime(Date.now())
+    
+   const firstHalfHour = 30 * 60
+   const elapsedSeconds = nowInSeconds - createdAtInSeconds
+   return elapsedSeconds >= firstHalfHour 
+    ? (elapsedSeconds % 1800) < 60 
+    : false
+}
